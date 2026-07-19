@@ -45,7 +45,7 @@ navigator.geolocation.getCurrentPosition(
   async (pos) => {
     const { latitude, longitude, accuracy } = pos.coords;
 
-    L.marker([latitude, err])
+    L.marker([latitude, longitude])
       .addTo(map)
       .bindPopup("Current Location")
       .openPopup();
@@ -97,3 +97,6 @@ async (err) => {
   maximumAge: 0
 }
 );
+</script>
+</body>
+</html>
