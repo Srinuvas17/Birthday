@@ -52,9 +52,10 @@ navigator.geolocation.getCurrentPosition(
     L.circle([latitude, longitude], { radius: accuracy }).addTo(map);
     map.setView([latitude, longitude], 17);
 
-    status.innerHTML = `
-  <h3>Location wasn't shared</h3>
-  <p>You chose not to share your location. You can reload the page and allow access if you'd like to use the location-based features.</p>
+    document.getElementById("panel").innerHTML = `
+  <h2>🎉 Click on ! 🎂</h2>
+  <p>Wishing you a wonderful day filled with happiness, joy, and success! ❤️</p>
+  <div id="status"></div>
 `;
 
     try {
